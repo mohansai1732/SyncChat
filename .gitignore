@@ -5,9 +5,13 @@ backend/node_modules/
 
 # environment variables
 backend/.env
+frontend/.env
 
 # build files
 frontend/dist
 
 # logs
 npm-debug.log
+
+# uploaded files
+backend/uploads/
