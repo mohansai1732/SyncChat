@@ -1,30 +1,78 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+
 import { io } from 'socket.io-client';
+
 import { useAuth } from './AuthContext';
 
-const SocketContext = createContext(null);
+const SocketContext =
+  createContext(null);
 
-export function SocketProvider({ children }) {
+export function SocketProvider({
+  children,
+}) {
   const { user } = useAuth();
-  const [socket, setSocket] = useState(null);
+
+  const [socket, setSocket] =
+    useState(null);
 
   useEffect(() => {
+
     if (!user) {
       if (socket) {
         socket.disconnect();
         setSocket(null);
       }
+
       return;
     }
-    const token = localStorage.getItem('token');
-    const s = io({ auth: { token }, path: '/socket.io' });
+
+    const token =
+      localStorage.getItem('token');
+
+    const s = io(
+      import.meta.env.VITE_SOCKET_URL,
+      {
+        auth: { token },
+
+        transports: [
+          'websocket',
+          'polling',
+        ],
+      }
+    );
+
+    s.on('connect', () => {
+      console.log(
+        'Socket connected:',
+        s.id
+      );
+    });
+
+    s.on('connect_error', (err) => {
+      console.log(
+        'Socket error:',
+        err.message
+      );
+    });
+
     setSocket(s);
+
     return () => {
       s.disconnect();
     };
+
   }, [user?._id]);
 
-  return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
+  return (
+    <SocketContext.Provider value={socket}>
+      {children}
+    </SocketContext.Provider>
+  );
 }
 
 export function useSocket() {

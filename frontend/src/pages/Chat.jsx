@@ -209,52 +209,100 @@ export default function Chat() {
   // =========================
 
   const startOrSelectConversation =
-    async (participant) => {
-      try {
-        const res = await api.post(
-          '/conversations',
-          {
-            participantId:
-              participant._id,
-          }
-        );
+  async (participant) => {
 
-        const conv = res.data;
+    try {
 
-        const existing = conversations.find(
-          (c) => c._id === conv._id
-        );
+      console.log(
+        'Selected participant:',
+        participant
+      );
 
-        if (!existing) {
-          setConversations((prev) => [
-            conv,
-            ...prev,
-          ]);
-        }
-
-        // Leave previous room
-        if (selectedConversation?._id) {
-          socket?.emit(
-            'leave_conversation',
-            selectedConversation._id
-          );
-        }
-
-        // Join new room
-        socket?.emit(
-          'join_conversation',
-          conv._id
-        );
-
-        setSelectedConversation(conv);
-
-      } catch (err) {
+      if (
+        !participant ||
+        !participant._id
+      ) {
         console.log(
-          'Conversation error:',
-          err
+          'Invalid participant'
+        );
+
+        return;
+      }
+
+      // Prevent self chat
+      if (
+        participant._id === user._id
+      ) {
+        console.log(
+          'Cannot chat with self'
+        );
+
+        return;
+      }
+
+      const res = await api.post(
+        '/conversations',
+        {
+          participantId:
+            participant._id,
+        }
+      );
+
+      const conv = res.data;
+
+      const existing =
+        conversations.find(
+          (c) =>
+            c._id === conv._id
+        );
+
+      if (!existing) {
+
+        const safeConv = {
+          ...conv,
+
+          participants:
+            conv.participants ||
+            [],
+
+          unreadCount: 0,
+        };
+
+        setConversations(
+          (prev) => [
+            safeConv,
+            ...prev,
+          ]
         );
       }
-    };
+
+      if (
+        selectedConversation?._id
+      ) {
+        socket?.emit(
+          'leave_conversation',
+          selectedConversation._id
+        );
+      }
+
+      socket?.emit(
+        'join_conversation',
+        conv._id
+      );
+
+      setSelectedConversation(
+        conv
+      );
+
+    } catch (err) {
+
+      console.log(
+        'Conversation error:',
+        err.response?.data ||
+          err.message
+      );
+    }
+  };
 
   // =========================
   // CLEAR UNREAD
