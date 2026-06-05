@@ -35,16 +35,20 @@ export function SocketProvider({
       localStorage.getItem('token');
 
     const s = io(
-      import.meta.env.VITE_SOCKET_URL,
-      {
-        auth: { token },
+  import.meta.env.VITE_SOCKET_URL,
+  {
+    auth: { token },
 
-        transports: [
-          'websocket',
-          'polling',
-        ],
-      }
-    );
+    transports: [
+      'polling',
+      'websocket',
+    ],
+
+    reconnection: true,
+    reconnectionAttempts: 5,
+    timeout: 20000,
+  }
+);
 
     s.on('connect', () => {
       console.log(

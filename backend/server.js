@@ -1,5 +1,9 @@
 console.log('[Backend] 1. Loading env and imports...');
 import 'dotenv/config';
+// ADD THIS:
+console.log('[ENV] MONGODB_URI:', process.env.MONGODB_URI ? 'FOUND ✅' : 'MISSING ❌');
+console.log('[ENV] JWT_SECRET:', process.env.JWT_SECRET ? 'FOUND ✅' : 'MISSING ❌');
+console.log('[ENV] CLIENT_URL:', process.env.CLIENT_URL ? 'FOUND ✅' : 'MISSING ❌');
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';

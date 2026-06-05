@@ -1,31 +1,31 @@
 import axios from 'axios';
 
 const api = axios.create({
-  // baseURL: 'https://web-chat-application-server.onrender.com/api',
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL:
+    import.meta.env.VITE_API_URL,
+
   withCredentials: true,
-  headers: { 'Content-Type': 'application/json' },
-});
 
-api.interceptors.request.use((config) => {
-  console.log('[API] Request', config.method?.toUpperCase(), config.url, config.data ? '(body)' : '');
-  const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
-
-api.interceptors.response.use(
-  (res) => {
-    console.log('[API] Response', res.status, res.config.url);
-    return res;
+  headers: {
+    'Content-Type':
+      'application/json',
   },
-  (err) => {
-    console.log('[API] Error', err.response?.status || err.code, err.config?.url, err.message);
-    if (err.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+});
+
+api.interceptors.request.use(
+  (config) => {
+
+    const token =
+      localStorage.getItem(
+        'token'
+      );
+
+    if (token) {
+      config.headers.Authorization =
+        `Bearer ${token}`;
     }
-    return Promise.reject(err);
+
+    return config;
   }
 );
 
