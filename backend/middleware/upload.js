@@ -1,31 +1,90 @@
 import multer from 'multer';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import {
+  CloudinaryStorage,
+} from 'multer-storage-cloudinary';
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../uploads'));
-  },
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, unique + path.extname(file.originalname) || '.jpg');
-  },
-});
+import cloudinary
+from '../config/cloudinary.js';
 
-const fileFilter = (req, file, cb) => {
-  const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-  if (allowed.includes(file.mimetype)) {
+const storage =
+  new CloudinaryStorage({
+
+    cloudinary,
+
+    params: async (
+      req,
+      file
+    ) => {
+
+      return {
+
+        folder: 'syncchat',
+
+        resource_type: 'auto',
+
+        public_id:
+          Date.now() +
+          '-' +
+          file.originalname
+            .split('.')[0],
+      };
+    },
+  });
+
+const fileFilter = (
+  req,
+  file,
+  cb
+) => {
+
+  const allowed = [
+
+    'image/jpeg',
+
+    'image/png',
+
+    'image/gif',
+
+    'image/webp',
+
+    'video/mp4',
+
+    'application/pdf',
+
+    'application/msword',
+
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  ];
+
+  if (
+    allowed.includes(
+      file.mimetype
+    )
+  ) {
+
     cb(null, true);
+
   } else {
-    cb(new Error('Only images (jpeg, png, gif, webp) are allowed.'), false);
+
+    cb(
+      new Error(
+        'Unsupported file type'
+      ),
+      false
+    );
   }
 };
 
-export const upload = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-});
+export const upload =
+  multer({
+
+    storage,
+
+    fileFilter,
+
+    limits: {
+      fileSize:
+        20 * 1024 * 1024,
+    },
+  });
