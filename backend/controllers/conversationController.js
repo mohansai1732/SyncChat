@@ -10,8 +10,28 @@ export const getOrCreateConversation =
       const { participantId } =
         req.body;
 
+      console.log(
+        'BODY:',
+        req.body
+      );
+
+      console.log(
+        'participantId:',
+        participantId
+      );
+
+      console.log(
+        'req.user:',
+        req.user?._id?.toString()
+      );
+
       // Validate ID exists
       if (!participantId) {
+
+        console.log(
+          'ERROR: participantId missing'
+        );
+
         return res.status(400).json({
           message:
             'Participant ID required.',
@@ -23,6 +43,11 @@ export const getOrCreateConversation =
         participantId ===
         req.user._id.toString()
       ) {
+
+        console.log(
+          'ERROR: self conversation attempt'
+        );
+
         return res.status(400).json({
           message:
             'Cannot create chat with yourself.',
@@ -35,6 +60,11 @@ export const getOrCreateConversation =
           participantId
         )
       ) {
+
+        console.log(
+          'ERROR: invalid ObjectId'
+        );
+
         return res.status(400).json({
           message:
             'Invalid participant ID.',
@@ -48,6 +78,11 @@ export const getOrCreateConversation =
         );
 
       if (!otherUser) {
+
+        console.log(
+          'ERROR: user not found'
+        );
+
         return res.status(404).json({
           message:
             'User not found.',
@@ -92,6 +127,10 @@ export const getOrCreateConversation =
       // Create if not exists
       if (!conversation) {
 
+        console.log(
+          'Creating new conversation...'
+        );
+
         conversation =
           await Conversation.create({
             participants,
@@ -108,6 +147,11 @@ export const getOrCreateConversation =
             .populate(
               'lastMessage'
             );
+      } else {
+
+        console.log(
+          'Existing conversation found'
+        );
       }
 
       res.json(conversation);

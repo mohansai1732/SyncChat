@@ -5,9 +5,15 @@ import {
   useState,
 } from 'react';
 
+
 import { io } from 'socket.io-client';
 
 import { useAuth } from './AuthContext';
+
+console.log(
+  "SOCKET URL:",
+  import.meta.env.VITE_SOCKET_URL
+);
 
 const SocketContext =
   createContext(null);

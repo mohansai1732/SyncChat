@@ -65,7 +65,7 @@ export default function ChatWindow({ conversation, currentUser, socket, onConver
         imageUrl: imageUrl || undefined,
       });
       // console.log(res);
-      setMessages((prev) => [...prev, content]);
+      // setMessages((prev) => [...prev, res.data]);
       setInput('');
     } finally {
       setSending(false);

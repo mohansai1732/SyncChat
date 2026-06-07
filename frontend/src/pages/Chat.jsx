@@ -222,10 +222,7 @@ export default function Chat() {
         !participant ||
         !participant._id
       ) {
-        console.log(
-          'Invalid participant'
-        );
-
+        console.log('Invalid participant');
         return;
       }
 
@@ -233,10 +230,7 @@ export default function Chat() {
       if (
         participant._id === user._id
       ) {
-        console.log(
-          'Cannot chat with self'
-        );
-
+        console.log('Cannot chat with yourself');
         return;
       }
 

@@ -28,6 +28,7 @@ export const sendMessage = async (req, res, next) => {
     const { conversationId } = req.params;
     const { content, type = 'text', imageUrl } = req.body;
 
+    
     const message = await Message.create({
       conversation: conversationId,
       sender: req.user._id,
