@@ -13,7 +13,7 @@ export const searchUsers = async (req, res, next) => {
         { email: { $regex: q.trim(), $options: 'i' } },
       ],
     })
-      .select('name email avatar isOnline lastSeen')
+      .select('name email isOnline lastSeen')
       .limit(20);
     res.json(users);
   } catch (error) {
@@ -24,7 +24,7 @@ export const searchUsers = async (req, res, next) => {
 export const getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id)
-      .select('name email avatar isOnline lastSeen')
+      .select('name email isOnline lastSeen')
       .lean();
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });

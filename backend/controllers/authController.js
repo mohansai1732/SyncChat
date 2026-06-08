@@ -27,7 +27,6 @@ export const signup = async (req, res, next) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      avatar: user.avatar,
       token,
     });
   } catch (error) {
@@ -56,7 +55,6 @@ export const login = async (req, res, next) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      avatar: user.avatar,
       token,
     });
   } catch (error) {
@@ -67,20 +65,6 @@ export const login = async (req, res, next) => {
 export const getMe = async (req, res, next) => {
   try {
     res.json(req.user);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const updateProfile = async (req, res, next) => {
-  try {
-    const { name, avatar } = req.body;
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { ...(name && { name }), ...(avatar !== undefined && { avatar }) },
-      { new: true }
-    ).select('-password');
-    res.json(user);
   } catch (error) {
     next(error);
   }

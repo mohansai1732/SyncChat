@@ -38,7 +38,7 @@ const fileFilter = (
   cb
 ) => {
 
-  const allowed = [
+const allowed = [
 
     'image/jpeg',
 
@@ -55,6 +55,12 @@ const fileFilter = (
     'application/msword',
 
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+
+    'text/plain',
+
+    'text/csv',
+
+    'application/zip',
   ];
 
   if (

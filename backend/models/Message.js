@@ -18,12 +18,28 @@ const messageSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['text', 'image'],
+      enum: ['text', 'image', 'file'],
       default: 'text',
     },
     imageUrl: {
       type: String,
       default: '',
+    },
+    fileUrl: {
+      type: String,
+      default: '',
+    },
+    fileName: {
+      type: String,
+      default: '',
+    },
+    fileMimeType: {
+      type: String,
+      default: '',
+    },
+    fileSize: {
+      type: Number,
+      default: 0,
     },
     seenBy: [
       {

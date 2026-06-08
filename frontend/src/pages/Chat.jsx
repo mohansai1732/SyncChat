@@ -62,6 +62,14 @@ export default function Chat() {
       const res = await api.get('/conversations');
 
       setConversations(res.data);
+      setOnlineUsers(
+        new Set(
+          res.data
+            .flatMap((conv) => conv.participants || [])
+            .filter((participant) => participant.isOnline && participant._id !== user._id)
+            .map((participant) => participant._id)
+        )
+      );
     } catch (err) {
       console.log(
         'Load conversations error:',
@@ -80,6 +88,7 @@ export default function Chat() {
 
   const handleNewMessage = (message) => {
     const convId = message.conversation;
+    const conversationDetails = message.conversationDetails || {};
 
     const isForSelected =
       selectedConversation?._id === convId;
@@ -109,8 +118,11 @@ export default function Chat() {
       } else {
         updated = [
           {
+            ...conversationDetails,
             _id: convId,
-            participants: [],
+            participants:
+              conversationDetails.participants ||
+              [],
             lastMessage: message,
             lastMessageAt:
               message.createdAt,
@@ -135,6 +147,8 @@ export default function Chat() {
           ? {
               ...prev,
               lastMessage: message,
+              lastMessageAt:
+                message.createdAt,
             }
           : null
       );
@@ -373,11 +387,28 @@ export default function Chat() {
           );
 
           setConversations((prev) =>
-            prev.map((c) =>
-              c._id === updated._id
-                ? updated
-                : c
-            )
+            prev
+              .map((c) =>
+                c._id === updated._id
+                  ? {
+                      ...c,
+                      ...updated,
+                      unreadCount:
+                        updated.unreadCount ??
+                        c.unreadCount ??
+                        0,
+                    }
+                  : c
+              )
+              .sort(
+                (a, b) =>
+                  new Date(
+                    b.lastMessageAt || 0
+                  ) -
+                  new Date(
+                    a.lastMessageAt || 0
+                  )
+              )
           );
         }}
       />

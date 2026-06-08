@@ -180,7 +180,11 @@ export default function Sidebar({
     }
 
     if (last.type === 'image') {
-      return '📷 Photo';
+      return 'Photo';
+    }
+
+    if (last.type === 'file') {
+      return last.fileName || 'File';
     }
 
     return (
@@ -204,7 +208,6 @@ export default function Sidebar({
       <header className={styles.header}>
 
         <Avatar
-          src={user?.avatar}
           name={user?.name}
           size={40}
         />
@@ -351,7 +354,6 @@ export default function Sidebar({
                 >
 
                   <Avatar
-                    src={u.avatar}
                     name={u.name}
                     size={44}
                   />
@@ -458,7 +460,6 @@ export default function Sidebar({
               >
 
                 <Avatar
-                  src={other.avatar}
                   name={other.name}
                   size={48}
                 />

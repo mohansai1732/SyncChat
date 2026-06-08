@@ -1,4 +1,4 @@
-export const uploadImage = (
+export const uploadFile = (
   req,
   res,
   next
@@ -23,8 +23,14 @@ export const uploadImage = (
   }
 
   const url = req.file.secure_url || req.file.path || req.file.url;
+  const mimeType = req.file.mimetype || '';
+  const isImage = mimeType.startsWith('image/');
 
   res.json({
     url,
+    name: req.file.originalname,
+    mimeType,
+    size: req.file.size || 0,
+    type: isImage ? 'image' : 'file',
   });
 };

@@ -7,9 +7,6 @@ console.log('[ENV] CLIENT_URL:', process.env.CLIENT_URL ? 'FOUND ✅' : 'MISSING
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
 
 import cors from 'cors';
 import connectDB from './config/db.js';
@@ -23,8 +20,6 @@ import messageRoutes from './routes/messageRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 
 console.log('[Backend] 2. Imports done. Preparing server...');
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 console.log('[Backend] 3. Creating Express app and HTTP server...');
 const app = express();
@@ -40,10 +35,6 @@ console.log('[Backend] 4. Socket.io initialized.');
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-const uploadsPath = path.join(__dirname, 'uploads');
-fs.mkdirSync(uploadsPath, { recursive: true });
-app.use('/uploads', express.static(uploadsPath));
 
 console.log('[Backend] 5. Mounting routes...');
 app.use('/api/auth', authRoutes);

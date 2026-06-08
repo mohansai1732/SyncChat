@@ -56,10 +56,13 @@ export const initSocket = (io) => {
 export const emitNewMessage = (io, conversation, message) => {
   const conversationId = conversation._id.toString();
   const participantRooms = conversation.participants.map((participantId) => {
-    return `user:${participantId.toString()}`;
+    return `user:${(participantId._id || participantId).toString()}`;
   });
 
-  io.to([`conv:${conversationId}`, ...participantRooms]).emit('message:new', message);
+  io.to([`conv:${conversationId}`, ...participantRooms]).emit('message:new', {
+    ...message,
+    conversationDetails: conversation,
+  });
 };
 
 export const emitMessageSeen = (io, conversationId, data) => {

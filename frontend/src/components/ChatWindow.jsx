@@ -54,14 +54,18 @@ export default function ChatWindow({ conversation, currentUser, socket, onConver
     return () => socket.off('message:new', onNew);
   }, [socket, conversation?._id]);
 
-  const sendMessage = async (content, type = 'text', imageUrl = '') => {
+  const sendMessage = async (content, attachment = null) => {
     if (!conversation?._id) return;
     setSending(true);
     try {
       const res = await api.post(`/messages/${conversation._id}`, {
         content: content || '',
-        type,
-        imageUrl: imageUrl || undefined,
+        type: attachment?.type || 'text',
+        imageUrl: attachment?.type === 'image' ? attachment.url : undefined,
+        fileUrl: attachment?.url,
+        fileName: attachment?.name,
+        fileMimeType: attachment?.mimeType,
+        fileSize: attachment?.size,
       });
       setMessages((prev) => (prev.some((m) => m._id === res.data._id) ? prev : [...prev, res.data]));
       onConversationUpdate?.({
@@ -79,27 +83,25 @@ export default function ChatWindow({ conversation, currentUser, socket, onConver
     e.preventDefault();
     const text = input.trim();
     if (!text || sending) return;
-    sendMessage(text, 'text');
+    sendMessage(text);
   };
 
-  const handleImageSelect = (e) => {
-    console.log('Image select triggered');
+  const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
-    console.log('Selected file:', file);
     if (!file) return;
     setUploading(true);
     const formData = new FormData();
-    formData.append('image', file);
+    formData.append('file', file);
     api
-      .post('/upload/image', formData, {
+      .post('/upload/file', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then(({ data }) => {
-        if (!data.url) throw new Error('Upload did not return an image URL.');
-        return sendMessage('', 'image', data.url);
+        if (!data.url) throw new Error('Upload did not return a file URL.');
+        return sendMessage('', data);
       })
       .catch((error) => {
-        console.log('Image upload failed:', error.response?.data || error.message);
+        console.log('File upload failed:', error.response?.data || error.message);
       })
       .finally(() => setUploading(false));
     e.target.value = '';
@@ -116,7 +118,7 @@ export default function ChatWindow({ conversation, currentUser, socket, onConver
   return (
     <div className={styles.window}>
       <header className={styles.header}>
-        <Avatar src={other.avatar} name={other.name} size={40} />
+        <Avatar name={other.name} size={40} />
         <div className={styles.headerInfo}>
           <span className={styles.headerName}>{other.name || other.email || 'Chat'}</span>
           <span className={styles.headerStatus}>Tap for more info</span>
@@ -130,6 +132,7 @@ export default function ChatWindow({ conversation, currentUser, socket, onConver
             key={msg._id}
             message={msg}
             isOwn={msg.sender?._id === currentUser?._id || msg.sender === currentUser?._id}
+            currentUserId={currentUser?._id}
           />
         ))}
         <div ref={messagesEndRef} />
@@ -137,8 +140,14 @@ export default function ChatWindow({ conversation, currentUser, socket, onConver
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <label className={styles.attachBtn}>
-          <input type="file" accept="image/*" onChange={handleImageSelect} disabled={uploading} hidden />
-          {uploading ? '…' : '📷'}
+          <input
+            type="file"
+            accept="image/*,video/mp4,.pdf,.doc,.docx,.txt,.csv,.zip"
+            onChange={handleFileSelect}
+            disabled={uploading}
+            hidden
+          />
+          {uploading ? '...' : '+'}
         </label>
         <input
           type="text"
@@ -155,3 +164,4 @@ export default function ChatWindow({ conversation, currentUser, socket, onConver
     </div>
   );
 }
+

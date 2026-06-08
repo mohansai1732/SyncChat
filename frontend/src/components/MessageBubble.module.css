@@ -41,6 +41,47 @@
   vertical-align: top;
 }
 
+.fileWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 220px;
+  max-width: 320px;
+  padding: 0.65rem;
+  margin-bottom: 0.35rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.16);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.fileIcon {
+  flex-shrink: 0;
+  padding: 0.35rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.fileInfo {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.fileName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileMeta {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .meta {
   display: flex;
   align-items: center;

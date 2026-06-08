@@ -9,19 +9,37 @@ const getMediaUrl = (url) => {
   return new URL(url, backendOrigin).toString();
 };
 
-export default function MessageBubble({ message, isOwn }) {
+const formatFileSize = (size = 0) => {
+  if (!size) return '';
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${Math.round(size / 1024)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+export default function MessageBubble({ message, isOwn, currentUserId }) {
   const time = message.createdAt
     ? new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : '';
-  const seen = message.seenBy?.length > 0;
-  const imageUrl = getMediaUrl(message.imageUrl);
+  const seen = message.seenBy?.some((id) => id.toString() !== currentUserId);
+  const fileUrl = getMediaUrl(message.fileUrl || message.imageUrl);
+  const isImage = message.type === 'image';
+  const isFile = message.type === 'file';
 
   return (
     <div className={`${styles.wrapper} ${isOwn ? styles.own : ''}`}>
       <div className={styles.bubble}>
-        {message.type === 'image' && imageUrl && (
-          <a href={imageUrl} target="_blank" rel="noopener noreferrer" className={styles.imageWrap}>
-            <img src={imageUrl} alt="" className={styles.image} />
+        {isImage && fileUrl && (
+          <a href={fileUrl} target="_blank" rel="noopener noreferrer" className={styles.imageWrap}>
+            <img src={fileUrl} alt={message.fileName || 'Shared image'} className={styles.image} />
+          </a>
+        )}
+        {isFile && fileUrl && (
+          <a href={fileUrl} target="_blank" rel="noopener noreferrer" className={styles.fileWrap}>
+            <span className={styles.fileIcon}>FILE</span>
+            <span className={styles.fileInfo}>
+              <span className={styles.fileName}>{message.fileName || 'Attachment'}</span>
+              <span className={styles.fileMeta}>{formatFileSize(message.fileSize)}</span>
+            </span>
           </a>
         )}
         {message.type === 'text' && message.content && <p className={styles.text}>{message.content}</p>}

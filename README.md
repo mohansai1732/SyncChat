@@ -10,11 +10,11 @@ A clean, resume-level real-time chat app using **React**, **Node.js**, **Express
 
 ## Features
 
-- **Auth:** Signup, Login, JWT, basic profile (name, avatar)
+- **Auth:** Signup, Login, JWT, basic profile (name, email)
 - **Real-time:** One-to-one messaging, Socket.io, timestamps, seen status
 - **Conversations:** Recent chat list, last message preview, unread count
 - **User status:** Online / offline indicator
-- **Media:** Send image messages, stored in backend `/uploads`
+- **Media:** Send image, video, document, and file messages using Cloudinary
 - **UI:** WhatsApp-style layout, sidebar chat list, message bubbles, responsive
 
 ## Project Structure
@@ -46,7 +46,6 @@ chat-application/
 │   │   └── uploadRoutes.js
 │   ├── socket/
 │   │   └── index.js           # Socket.io auth, join/leave, online/offline
-│   ├── uploads/               # Image uploads (local)
 │   ├── server.js
 │   ├── .env.example
 │   └── package.json

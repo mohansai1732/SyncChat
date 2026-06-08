@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Conversation from '../models/Conversation.js';
 import User from '../models/User.js';
+import Message from '../models/Message.js';
 
 export const getOrCreateConversation =
   async (req, res, next) => {
@@ -110,13 +111,13 @@ export const getOrCreateConversation =
         })
           .populate(
             'participants',
-            'name email avatar isOnline lastSeen'
+            'name email isOnline lastSeen'
           )
           .populate({
             path: 'lastMessage',
 
             select:
-              'content type imageUrl sender createdAt',
+              'content type imageUrl fileUrl fileName fileMimeType fileSize sender createdAt seenBy',
 
             populate: {
               path: 'sender',
@@ -142,7 +143,7 @@ export const getOrCreateConversation =
           )
             .populate(
               'participants',
-              'name email avatar isOnline lastSeen'
+              'name email isOnline lastSeen'
             )
             .populate(
               'lastMessage'
@@ -172,26 +173,32 @@ export const getConversations = async (req, res, next) => {
     const conversations = await Conversation.find({
       participants: req.user._id,
     })
-      .populate('participants', 'name email avatar isOnline lastSeen')
+      .populate('participants', 'name email isOnline lastSeen')
       .populate({
         path: 'lastMessage',
-        select: 'content type imageUrl sender createdAt seenBy',
+        select: 'content type imageUrl fileUrl fileName fileMimeType fileSize sender createdAt seenBy',
         populate: { path: 'sender', select: 'name' },
       })
       .sort({ lastMessageAt: -1 })
       .lean();
 
+    const unreadCounts = await Message.aggregate([
+      {
+        $match: {
+          conversation: { $in: conversations.map((conv) => conv._id) },
+          sender: { $ne: req.user._id },
+          seenBy: { $ne: req.user._id },
+        },
+      },
+      { $group: { _id: '$conversation', count: { $sum: 1 } } },
+    ]);
+
+    const unreadByConversation = new Map(
+      unreadCounts.map((item) => [item._id.toString(), item.count])
+    );
+
     const withUnread = conversations.map((conv) => {
-      const lastMsg = conv.lastMessage;
-      const senderId = lastMsg?.sender?._id?.toString() ?? lastMsg?.sender?.toString();
-      const unread =
-        lastMsg &&
-        senderId &&
-        senderId !== req.user._id.toString() &&
-        !lastMsg.seenBy?.some((id) => id.toString() === req.user._id.toString())
-          ? 1
-          : 0;
-      return { ...conv, unreadCount: unread };
+      return { ...conv, unreadCount: unreadByConversation.get(conv._id.toString()) || 0 };
     });
 
     res.json(withUnread);
