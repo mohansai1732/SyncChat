@@ -2,11 +2,23 @@ import Message from '../models/Message.js';
 import Conversation from '../models/Conversation.js';
 import { emitNewMessage, emitMessageSeen } from '../socket/index.js';
 
+const findUserConversation = async (conversationId, userId) => {
+  return Conversation.findOne({
+    _id: conversationId,
+    participants: userId,
+  });
+};
+
 export const getMessages = async (req, res, next) => {
   try {
     const { conversationId } = req.params;
     const limit = Math.min(parseInt(req.query.limit) || 50, 100);
     const before = req.query.before; // cursor for pagination
+
+    const conversation = await findUserConversation(conversationId, req.user._id);
+    if (!conversation) {
+      return res.status(404).json({ message: 'Conversation not found.' });
+    }
 
     const filter = { conversation: conversationId };
     if (before) filter.createdAt = { $lt: new Date(before) };
@@ -28,7 +40,11 @@ export const sendMessage = async (req, res, next) => {
     const { conversationId } = req.params;
     const { content, type = 'text', imageUrl } = req.body;
 
-    
+    const conversation = await findUserConversation(conversationId, req.user._id);
+    if (!conversation) {
+      return res.status(404).json({ message: 'Conversation not found.' });
+    }
+
     const message = await Message.create({
       conversation: conversationId,
       sender: req.user._id,
@@ -58,6 +74,11 @@ export const sendMessage = async (req, res, next) => {
 export const markSeen = async (req, res, next) => {
   try {
     const { conversationId } = req.params;
+    const conversation = await findUserConversation(conversationId, req.user._id);
+    if (!conversation) {
+      return res.status(404).json({ message: 'Conversation not found.' });
+    }
+
     await Message.updateMany(
       { conversation: conversationId, sender: { $ne: req.user._id } },
       { $addToSet: { seenBy: req.user._id } }

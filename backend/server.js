@@ -22,11 +22,9 @@ import conversationRoutes from './routes/conversationRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 
-console.log('[Backend] 2. Imports done. Connecting to DB...');
+console.log('[Backend] 2. Imports done. Preparing server...');
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-connectDB();
 
 console.log('[Backend] 3. Creating Express app and HTTP server...');
 const app = express();
@@ -58,7 +56,31 @@ app.use(notFound);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-console.log('[Backend] 6. Starting HTTP server on port', PORT, '...');
-httpServer.listen(PORT, () => {
-  console.log('[Backend] 7. Server RUNNING on http://localhost:' + PORT);
+
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    console.log('[Backend] 6. Starting HTTP server on port', PORT, '...');
+    httpServer.listen(PORT, () => {
+      console.log('[Backend] 7. Server RUNNING on http://localhost:' + PORT);
+    });
+  } catch (error) {
+    console.error('[Backend] Startup failed:', error.message);
+    process.exit(1);
+  }
+};
+
+httpServer.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(
+      `[Backend] Port ${PORT} is already in use. Stop the running server or set a different PORT in .env.`
+    );
+    process.exit(1);
+  }
+
+  console.error('[Backend] HTTP server error:', error.message);
+  process.exit(1);
 });
+
+startServer();

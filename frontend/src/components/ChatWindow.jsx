@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
-import { useSocket } from '../context/SocketContext';
 import Avatar from './Avatar';
 import MessageBubble from './MessageBubble';
 import styles from './ChatWindow.module.css';
@@ -87,15 +86,11 @@ export default function ChatWindow({ conversation, currentUser, socket, onConver
     setUploading(true);
     const formData = new FormData();
     formData.append('image', file);
-    const token = localStorage.getItem('token');
-    fetch('/api/upload/image', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-      credentials: 'include',
-    })
-      .then((r) => r.json())
-      .then((data) => {
+    api
+      .post('/upload/image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      .then(({ data }) => {
         if (data.url) sendMessage('', 'image', data.url);
       })
       .catch(() => {})
