@@ -23,6 +23,7 @@ export const initSocket = (io) => {
     const userId = socket.userId;
     if (!userSockets.has(userId)) userSockets.set(userId, new Set());
     userSockets.get(userId).add(socket.id);
+    socket.join(`user:${userId}`);
 
     User.findByIdAndUpdate(userId, { isOnline: true, lastSeen: new Date() }).catch(() => {});
 
@@ -52,8 +53,13 @@ export const initSocket = (io) => {
   return { userSockets, io };
 };
 
-export const emitNewMessage = (io, conversationId, message) => {
-  io.to(`conv:${conversationId}`).emit('message:new', message);
+export const emitNewMessage = (io, conversation, message) => {
+  const conversationId = conversation._id.toString();
+  const participantRooms = conversation.participants.map((participantId) => {
+    return `user:${participantId.toString()}`;
+  });
+
+  io.to([`conv:${conversationId}`, ...participantRooms]).emit('message:new', message);
 };
 
 export const emitMessageSeen = (io, conversationId, data) => {

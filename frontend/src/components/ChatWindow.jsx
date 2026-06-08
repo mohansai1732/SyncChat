@@ -63,8 +63,12 @@ export default function ChatWindow({ conversation, currentUser, socket, onConver
         type,
         imageUrl: imageUrl || undefined,
       });
-      // console.log(res);
-      // setMessages((prev) => [...prev, res.data]);
+      setMessages((prev) => (prev.some((m) => m._id === res.data._id) ? prev : [...prev, res.data]));
+      onConversationUpdate?.({
+        ...conversation,
+        lastMessage: res.data,
+        lastMessageAt: res.data.createdAt,
+      });
       setInput('');
     } finally {
       setSending(false);
@@ -91,9 +95,12 @@ export default function ChatWindow({ conversation, currentUser, socket, onConver
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then(({ data }) => {
-        if (data.url) sendMessage('', 'image', data.url);
+        if (!data.url) throw new Error('Upload did not return an image URL.');
+        return sendMessage('', 'image', data.url);
       })
-      .catch(() => {})
+      .catch((error) => {
+        console.log('Image upload failed:', error.response?.data || error.message);
+      })
       .finally(() => setUploading(false));
     e.target.value = '';
   };

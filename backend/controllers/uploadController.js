@@ -22,12 +22,9 @@ export const uploadImage = (
     });
   }
 
-  console.log(
-    'PATH:',
-    req.file.path
-  );
+  const url = req.file.secure_url || req.file.path || req.file.url;
 
   res.json({
-    url: req.file.path,
+    url,
   });
 };

@@ -63,7 +63,7 @@ export const sendMessage = async (req, res, next) => {
       .lean();
 
     const io = req.app.get('io');
-    if (io) emitNewMessage(io, conversationId, populated);
+    if (io) emitNewMessage(io, conversation, populated);
 
     res.status(201).json(populated);
   } catch (error) {
