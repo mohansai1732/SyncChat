@@ -80,6 +80,7 @@ export default function ChatWindow({ conversation, currentUser, socket, onConver
   };
 
   const handleImageSelect = (e) => {
+    console.log('Image select triggered');
     const file = e.target.files?.[0];
     console.log('Selected file:', file);
     if (!file) return;
