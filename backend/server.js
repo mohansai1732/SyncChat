@@ -25,14 +25,38 @@ console.log('[Backend] 3. Creating Express app and HTTP server...');
 const app = express();
 const httpServer = createServer(app);
 
+// Sanitize CORS origin(s) by stripping trailing slashes and supporting comma-separated domains
+const clientUrlRaw = process.env.CLIENT_URL || 'http://localhost:5173';
+const allowedOrigins = clientUrlRaw
+  .split(',')
+  .map((url) => url.trim().replace(/\/+$/, ''))
+  .filter(Boolean);
+
+const isOriginAllowed = (origin) => {
+  if (!origin) return true;
+  const sanitized = origin.replace(/\/+$/, '');
+  return allowedOrigins.includes(sanitized) || allowedOrigins.includes('*') || process.env.NODE_ENV !== 'production';
+};
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (isOriginAllowed(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS origin not allowed: ${origin}`));
+    }
+  },
+  credentials: true,
+};
+
 const io = new Server(httpServer, {
-  cors: { origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true },
+  cors: corsOptions,
 });
 app.set('io', io);
 initSocket(io);
 console.log('[Backend] 4. Socket.io initialized.');
 
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
