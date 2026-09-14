@@ -2,31 +2,34 @@
 
 ## Supported Versions
 
-We actively maintain the latest version of CollabCode and provide security updates for supported releases.
+The following versions of this project are currently supported with security updates:
 
-| Version        | Supported          |
-| -------------- | ------------------ |
-| Latest release | :white_check_mark: |
-| Older releases | :x:                |
+| Version | Supported          |
+| ------- | ------------------ |
+| 5.1.x   | :white_check_mark: |
+| 5.0.x   | :x:                |
+| 4.0.x   | :white_check_mark: |
+| < 4.0   | :x:                |
 
-If you are using an older release, we recommend upgrading to the latest version before reporting an issue.
+---
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in CollabCode, please **do not report it through a public GitHub issue**.
+We take the security of our project seriously. If you believe you have found a security vulnerability, please follow the process outlined below to report it to us responsibly.
 
-Instead, please report the vulnerability privately through the repository's **GitHub Security Advisories** feature.
+### How to Report
+* **Do NOT create a public issue** or disclose the vulnerability publicly until it has been reviewed and patched.
+* Email your report to **mohansai1732@gmail.com** 
+* Please include as much detail as possible in your report:
+  * Description of the vulnerability and its potential impact.
+  * Step-by-step instructions to reproduce the issue.
+  * Proof-of-concept (PoC) code or requests, if applicable.
+  * Affected versions and environment setup.
 
-When reporting a vulnerability, please include:
-
-* A clear description of the vulnerability.
-* Steps to reproduce the issue.
-* The potential impact or security risk.
-* Any relevant screenshots, logs, or proof-of-concept code.
-* Suggested remediation, if available.
-
-We will review security reports as soon as possible and will make a reasonable effort to acknowledge the report and provide an initial response within **7 days**.
-
-If the vulnerability is confirmed, we will work on a fix and coordinate disclosure appropriately. If the report is determined not to be a security vulnerability, we will explain the reasoning where appropriate.
-
-Please avoid publicly disclosing the vulnerability until a fix or mitigation has been released.
+### What to Expect
+* **Acknowledgment:** We will acknowledge receipt of your vulnerability report within **48 hours**.
+* **Status Updates:** You can expect to receive regular status updates on our progress at least once every **5 business days**.
+* **Assessment & Patching:** 
+  * If the vulnerability is **accepted**, we will work on a patch and notify you prior to issuing a security release.
+  * If the vulnerability is **declined**, we will provide a clear explanation detailing why it was not considered a security issue.
+* **Public Disclosure & Credit:** Once a fix is released, we will publish a security advisory. We will gladly credit you in the release notes or advisory for your responsible disclosure (unless you request to remain anonymous).
